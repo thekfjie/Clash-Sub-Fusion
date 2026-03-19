@@ -1,7 +1,6 @@
+// 【All in one V3 - Unified】
 // 双订阅智能分流脚本
-// 功能：主力节点负责 AI，廉价节点负责下载与杂项。
-
-// 【All in one V2】
+// 功能：主力节点负责 AI，廉价节点负责下载与杂项。跨平台统一版本。
 
 function main(config) {
 
@@ -10,7 +9,7 @@ function main(config) {
   // =================================================
   // [⚠️注意] 请将下方的地址替换为你的 "备用/廉价" 订阅链接
   const cheapUrl = "YOUR_SUBSCRIPTION_URL_HERE";
-  
+
   if (!config['proxy-providers']) {
     config['proxy-providers'] = {};
   }
@@ -26,7 +25,7 @@ function main(config) {
       "interval": 600,
       "url": "http://www.gstatic.com/generate_204"
     },
-    "filter": "(?i)(港|HK|Hong|台|TW|Tai|美|US|States|America)" 
+    "filter": "(?i)(港|HK|Hong|台|TW|Tai|美|US|States|America|韩|Korea)" 
   };
 
   // 提取主力节点
@@ -115,7 +114,7 @@ function main(config) {
     ]
   };
 
-  // [GitHub] 原下载模式
+  // [GitHub] GitHub 专区
   const githubGroup = {
     "name": "⬇️ GitHub",
     "type": "select",
@@ -151,7 +150,7 @@ function main(config) {
   config['proxy-groups'] = [
     aiGroup,       
     gameGroup,     
-    githubGroup, 
+    githubGroup,
     proxyGroup,    
     finalGroup,    
     cnGroup,       
@@ -173,6 +172,7 @@ function main(config) {
     "DOMAIN,kugou.com,DIRECT",
     "DOMAIN,msftncsi.com,DIRECT",
     "DOMAIN,www.msftncsi.com,DIRECT",
+    "DOMAIN-SUFFIX,aliyun.com,DIRECT",
 
     // === 1. 游戏下载/CDN (强制直连) ===
     // Steam 下载
@@ -206,11 +206,18 @@ function main(config) {
     "DOMAIN-SUFFIX,helpshift.com,🎮 游戏商店",
     "DOMAIN-SUFFIX,paragon.com,🎮 游戏商店",
 
-    // === 3. AI 核心区 ===
+    // === 3. 特殊路由 ===
+    "DOMAIN-SUFFIX,kitty.su,🐱 廉价自动",
+
+    // === 4. AI 核心区 ===
+    "PROCESS-NAME,Antigravity.exe,🤖 AI 专线",
+    "PROCESS-NAME,opencode-cli.exe,🤖 AI 专线",
+    "PROCESS-NAME,OpenCode.exe,🤖 AI 专线",
     "DOMAIN-SUFFIX,gemini.google.com,🤖 AI 专线",
     "DOMAIN-SUFFIX,bard.google.com,🤖 AI 专线",
     "DOMAIN-SUFFIX,deepmind.com,🤖 AI 专线",
     "DOMAIN-SUFFIX,deepmind.google,🤖 AI 专线",
+    "DOMAIN-SUFFIX,play.googleapis.com,🤖 AI 专线",
     "DOMAIN-SUFFIX,generativelanguage.googleapis.com,🤖 AI 专线",
     "DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com,🤖 AI 专线",
     "DOMAIN-SUFFIX,antigravity-unleash.goog,🤖 AI 专线",
@@ -228,18 +235,21 @@ function main(config) {
     "DOMAIN-SUFFIX,anthropic.com,🤖 AI 专线",
     "DOMAIN-SUFFIX,claude.ai,🤖 AI 专线",
 
-    // === 4. GitHub 专区 (原下载区) ===
+    // === 5. GitHub 专区 ===
     "DOMAIN-SUFFIX,github.com,⬇️ GitHub",
     "DOMAIN-SUFFIX,githubusercontent.com,⬇️ GitHub",
     "DOMAIN-SUFFIX,github.io,⬇️ GitHub",
     
-    // === 5. Google 主站 ===
+    // === 6. Google 主站 ===
     "DOMAIN-SUFFIX,google.com,🤖 AI 专线",
     "DOMAIN-SUFFIX,youtube.com,🤖 AI 专线",
     "DOMAIN-SUFFIX,ytimg.com,🤖 AI 专线",
     "DOMAIN-KEYWORD,google,🤖 AI 专线",
 
-    // === 6. 兜底 ===
+    // === 7. 自建 ===
+    "PROCESS-NAME,ssh.exe,🚀 节点选择",
+
+    // === 8. 兜底 ===
     "GEOIP,CN,🇨🇳 国内连接",
     "GEOSITE,CN,🇨🇳 国内连接",
     "MATCH,🐟 漏网之鱼"
