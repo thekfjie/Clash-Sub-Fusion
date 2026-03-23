@@ -1,0 +1,235 @@
+# =================================================
+# 1. 核心环境：Tun 模式 (SideStore 救命必须项)
+# =================================================
+tun:
+  enable: true
+  stack: system
+  auto-route: true
+  auto-detect-interface: true
+  dns-hijack:
+    - any:53
+  loopback-address:
+    - 10.7.0.1
+
+# =================================================
+# 2. 资源配置 (双订阅)
+# =================================================
+proxy-providers:
+  # [主力] 樱桃网络
+  Cherry-Main:
+    type: http
+    url: "YOUR_MAIN_SUBSCRIPTION_URL_HERE"
+    interval: 3600
+    path: ./proxies/cherry.yaml
+    health-check:
+      enable: true
+      interval: 600
+      url: http://www.gstatic.com/generate_204
+
+  # [备用] Kitty 免费池
+  Kitty-Expansion:
+    type: http
+    url: "YOUR_BASE_SUBSCRIPTION_URL_HERE"
+    interval: 3600
+    path: ./proxies/kitty.yaml
+    filter: "(?i)(港|HK|Hong|台|TW|Tai|美|US|States|America|韩|Korea)"
+    health-check:
+      enable: true
+      interval: 600
+      url: http://www.gstatic.com/generate_204
+
+# =================================================
+# 3. 策略组 (逻辑引擎)
+# =================================================
+proxy-groups:
+  # --- 总控 ---
+  - name: "🚀 节点选择"
+    type: select
+    proxies:
+      - "⚡ 优质自动"
+      - "🐱 廉价自动"
+      - "DIRECT"
+    use:
+      - Cherry-Main
+      - Kitty-Expansion
+
+  # --- 自动引擎 ---
+  - name: "⚡ 优质自动"
+    type: url-test
+    url: "http://www.gstatic.com/generate_204"
+    interval: 300
+    tolerance: 50
+    use:
+      - Cherry-Main
+
+  - name: "🐱 廉价自动"
+    type: url-test
+    url: "http://www.gstatic.com/generate_204"
+    interval: 300
+    tolerance: 50
+    use:
+      - Kitty-Expansion
+
+  # --- 地区自动 ---
+  - name: "🇺🇸 US 自动"
+    type: url-test
+    url: "http://www.gstatic.com/generate_204"
+    interval: 300
+    use:
+      - Cherry-Main
+    filter: "(?i)(美国|美國|US|States|America)"
+
+  - name: "🇸🇬 SG 自动"
+    type: url-test
+    url: "http://www.gstatic.com/generate_204"
+    interval: 300
+    use:
+      - Cherry-Main
+    filter: "(?i)(新加坡|獅城|Singapore|SG)"
+
+  - name: "🇯🇵 JP 自动"
+    type: url-test
+    url: "http://www.gstatic.com/generate_204"
+    interval: 300
+    use:
+      - Cherry-Main
+    filter: "(?i)(日本|JP|Japan)"
+
+  - name: "🇰🇷 KR 自动"
+    type: url-test
+    url: "http://www.gstatic.com/generate_204"
+    interval: 300
+    use:
+      - Cherry-Main
+    filter: "(?i)(韩国|韓|Korea|KR|Seoul)"
+
+  # --- 功能分流 ---
+  - name: "🤖 AI 专线"
+    type: select
+    proxies:
+      - "🇺🇸 US 自动"
+      - "🇸🇬 SG 自动"
+      - "🇯🇵 JP 自动"
+      - "🇰🇷 KR 自动"
+      - "🚀 节点选择"
+
+  - name: "💬 GPT 专线"
+    type: select
+    proxies:
+      - "🇺🇸 US 自动"
+      - "🇸🇬 SG 自动"
+      - "🇯🇵 JP 自动"
+      - "🇰🇷 KR 自动"
+      - "🚀 节点选择"
+
+  - name: "🎮 游戏商店"
+    type: select
+    proxies:
+      - "🐱 廉价自动"
+      - "⚡ 优质自动"
+      - "🚀 节点选择"
+      - "DIRECT"
+
+  - name: "⬇️ GitHub"
+    type: select
+    proxies:
+      - "🐱 廉价自动"
+      - "⚡ 优质自动"
+      - "🚀 节点选择"
+      - "DIRECT"
+    use:
+      - Kitty-Expansion
+
+  - name: "🐟 漏网之鱼"
+    type: select
+    proxies:
+      - "🐱 廉价自动"
+      - "🚀 节点选择"
+      - "⚡ 优质自动"
+      - "DIRECT"
+
+  - name: "🇨🇳 国内连接"
+    type: select
+    proxies:
+      - "DIRECT"
+      - "🚀 节点选择"
+
+# =================================================
+# 4. 规则集
+# =================================================
+rules:
+  # === 0. iOS & SideStore 专用核心规则 ===
+  - IP-CIDR,10.7.0.1/32,DIRECT,no-resolve
+  - DOMAIN-SUFFIX,sidestore.io,🚀 节点选择
+  - DOMAIN-SUFFIX,gsa.apple.com,🚀 节点选择
+  - DOMAIN,idmsa.apple.com,🚀 节点选择
+
+  # === 1. 强制直连 (常规 & 苹果服务) ===
+  - DOMAIN-SUFFIX,mzstatic.com,DIRECT
+  - DOMAIN,kugou.com,DIRECT
+  - DOMAIN,msftncsi.com,DIRECT
+  - DOMAIN,www.msftncsi.com,DIRECT
+  - DOMAIN-SUFFIX,aliyun.com,DIRECT
+
+  # === 2. 游戏下载/CDN (强制直连) ===
+  - DOMAIN-SUFFIX,steamserver.net,DIRECT
+  - GEOSITE,steam@cn,DIRECT
+  - DOMAIN,connect.epicgames.dev,DIRECT
+  - DOMAIN,launcher-public-service-prod06.ol.epicgames.com,DIRECT
+  - DOMAIN-SUFFIX,epicgames-download1.akamaized.net,DIRECT
+  - DOMAIN-SUFFIX,epicgames-download,DIRECT
+  - DOMAIN-SUFFIX,d-epicgames,DIRECT
+  - DOMAIN-SUFFIX,egdownload.fastly-edge.com,DIRECT
+
+  # === 3. 游戏商店 (走专用分组) ===
+  - DOMAIN-SUFFIX,steampowered.com,🎮 游戏商店
+  - DOMAIN-SUFFIX,steamcommunity.com,🎮 游戏商店
+  - DOMAIN-SUFFIX,steamgames.com,🎮 游戏商店
+  - DOMAIN-SUFFIX,steamusercontent.com,🎮 游戏商店
+  - DOMAIN-SUFFIX,epicgames.com,🎮 游戏商店
+  - DOMAIN-SUFFIX,unrealengine.com,🎮 游戏商店
+  - DOMAIN-SUFFIX,helpshift.com,🎮 游戏商店
+  - DOMAIN-SUFFIX,paragon.com,🎮 游戏商店
+
+  # === 4. 特殊路由 ===
+  - DOMAIN-SUFFIX,kitty.su,🐱 廉价自动
+  - DOMAIN-SUFFIX,gpt.a0yark.cn,🐱 廉价自动
+
+  # === 5. AI 核心区 ===
+  - DOMAIN-SUFFIX,gemini.google.com,🤖 AI 专线
+  - DOMAIN-SUFFIX,bard.google.com,🤖 AI 专线
+  - DOMAIN-SUFFIX,deepmind.com,🤖 AI 专线
+  - DOMAIN-SUFFIX,deepmind.google,🤖 AI 专线
+  - DOMAIN-SUFFIX,play.googleapis.com,🤖 AI 专线
+  - DOMAIN-SUFFIX,generativelanguage.googleapis.com,🤖 AI 专线
+  - DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com,🤖 AI 专线
+  - DOMAIN-SUFFIX,antigravity-unleash.goog,🤖 AI 专线
+  - DOMAIN-SUFFIX,app-analytics-services.com,🤖 AI 专线
+  - GEOSITE,google-deepmind,🤖 AI 专线
+  - DOMAIN-SUFFIX,googleusercontent.com,🤖 AI 专线
+  - DOMAIN-SUFFIX,gstatic.com,🤖 AI 专线
+
+  - DOMAIN-SUFFIX,openai.com,💬 GPT 专线
+  - DOMAIN-SUFFIX,chatgpt.com,💬 GPT 专线
+  - DOMAIN-SUFFIX,oaistatic.com,💬 GPT 专线
+  - DOMAIN-SUFFIX,oaiusercontent.com,💬 GPT 专线
+  - DOMAIN-SUFFIX,bing.com,🤖 AI 专线
+  - DOMAIN-SUFFIX,copilot.microsoft.com,🤖 AI 专线
+  - DOMAIN-SUFFIX,anthropic.com,🤖 AI 专线
+  - DOMAIN-SUFFIX,claude.ai,🤖 AI 专线
+
+  # === 6. GitHub 专区 ===
+  - DOMAIN-SUFFIX,github.com,⬇️ GitHub
+  - DOMAIN-SUFFIX,githubusercontent.com,⬇️ GitHub
+  - DOMAIN-SUFFIX,github.io,⬇️ GitHub
+
+  # === 7. Google 主站 ===
+  - DOMAIN-SUFFIX,google.com,🤖 AI 专线
+  - DOMAIN-SUFFIX,youtube.com,🤖 AI 专线
+  - DOMAIN-SUFFIX,ytimg.com,🤖 AI 专线
+  - DOMAIN-KEYWORD,google,🤖 AI 专线
+
+  # === 8. 兜底 ===
+  - GEOIP,CN,🇨🇳 国内连接
+  - GEOSITE,CN,🇨🇳 国内连接
+  - MATCH,🐟 漏网之鱼
