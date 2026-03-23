@@ -114,6 +114,19 @@ function main(config) {
     ]
   };
 
+  // [GPT] GPT 专线
+  const gptGroup = {
+    "name": "💬 GPT 专线",
+    "type": "select",
+    "proxies": [
+      "🇺🇸 US 自动", 
+      "🇸🇬 SG 自动",
+      "🇯🇵 JP 自动",
+      "🇰🇷 KR 自动",
+      "🚀 节点选择" 
+    ]
+  };
+
   // [GitHub] GitHub 专区
   const githubGroup = {
     "name": "⬇️ GitHub",
@@ -149,6 +162,7 @@ function main(config) {
   // 写入分组
   config['proxy-groups'] = [
     aiGroup,       
+    gptGroup,
     gameGroup,     
     githubGroup,
     proxyGroup,    
@@ -208,6 +222,7 @@ function main(config) {
 
     // === 3. 特殊路由 ===
     "DOMAIN-SUFFIX,kitty.su,🐱 廉价自动",
+    "DOMAIN-SUFFIX,gpt.a0yark.cn,🐱 廉价自动",
 
     // === 4. AI 核心区 ===
     "PROCESS-NAME,Antigravity.exe,🤖 AI 专线",
@@ -226,10 +241,10 @@ function main(config) {
     "DOMAIN-SUFFIX,googleusercontent.com,🤖 AI 专线",
     "DOMAIN-SUFFIX,gstatic.com,🤖 AI 专线", 
     
-    "DOMAIN-SUFFIX,openai.com,🤖 AI 专线",
-    "DOMAIN-SUFFIX,chatgpt.com,🤖 AI 专线",
-    "DOMAIN-SUFFIX,oaistatic.com,🤖 AI 专线",
-    "DOMAIN-SUFFIX,oaiusercontent.com,🤖 AI 专线",
+    "DOMAIN-SUFFIX,openai.com,💬 GPT 专线",
+    "DOMAIN-SUFFIX,chatgpt.com,💬 GPT 专线",
+    "DOMAIN-SUFFIX,oaistatic.com,💬 GPT 专线",
+    "DOMAIN-SUFFIX,oaiusercontent.com,💬 GPT 专线",
     "DOMAIN-SUFFIX,bing.com,🤖 AI 专线",
     "DOMAIN-SUFFIX,copilot.microsoft.com,🤖 AI 专线",
     "DOMAIN-SUFFIX,anthropic.com,🤖 AI 专线",
