@@ -1,32 +1,15 @@
-# Clash 分流脚本：双订阅版 (Premium + Cheap)
+# Clash 分流配置：双订阅版 (Premium + Cheap)
 
-> V3 - 跨平台统一版本 (PC / Mobile)
-
-## 🎯 适用人群
-
-这个脚本特别适合以下类型的用户：
-
-1.  **多持节点**：同时拥有一个**贵但稳的主力机场**（Premium），和一个**便宜但量大的备用机场**（Cheap/Bulk）。
-2.  **用AI**：每天离不开 ChatGPT、Gemini、Claude，且对账号安全（IP 稳定性）有极高要求。
-3.  **想省钱**：希望在保证核心体验的前提下，最大化利用廉价节点的流量。
+> V3.1 - (PC / Mobile)
 
 ## 🧩 核心策略组 (Proxy Groups) 解析
 
-脚本将流量极其精细地划分到了不同的"车道"，逻辑如下：
-
 ### 1. 🤖 AI 专线 (Premium Lane)
-* **策略**：
-    * **强制走主力优质节点**：确保低延迟和高可用性。
-    * **严格锁区**：仅从 `🇺🇸 美国`、`🇸🇬 新加坡`、`🇯🇵 日本`、`🇰🇷 韩国` 中自动选择，防止 IP 乱飘。
-    * **防封号机制**：强制 Google 的静态资源域名（`gstatic`, `googleusercontent`）跟随主站走同线路，避免因"主站美国、图片香港"的 IP 跳变导致的风控。
-* **覆盖范围**：Google AI (Gemini, DeepMind)、OpenAI (ChatGPT)、Anthropic (Claude)、Microsoft (Copilot, Bing)、Google 主站 (YouTube, Search)。
+* **覆盖范围**：Google AI (Gemini, DeepMind)、Anthropic (Claude)、Microsoft (Copilot, Bing)、Google 主站 (YouTube, Search)，其中主要是对Gemini系约束。
+
+## 1.5 GPT 线路
 
 ### 2. 🎮 游戏商店 (Game Store Lane)
-* **功能**：专为游戏平台**商店页面和社区**设计，与下载 CDN 分离。
-* **策略**：
-    * **默认走廉价节点**：浏览商店页面不消耗优质流量。
-    * **下载 CDN 强制直连**：Steam、Epic 的下载服务器走直连，速度最快。
-    * **游戏进程直连**：CS2、Dota2 等游戏进程直连，避免加速器冲突。
 * **覆盖范围**：Steam 商店/社区、Epic Games Store。
 
 ### 3. ⬇️ GitHub (Code Lane)
@@ -44,7 +27,6 @@
 ### 5. 🚀 节点选择 (Manual Control)
 * **功能**：手动总控，也是"漏网之鱼"的备用靠山。
 * **策略**：
-    * **无死循环设计**：经过特殊优化，**不包含** AI 或下载组，彻底根除 Clash `Loop Detected` 报错。
     * **最高优先级**：当你想手动指定某条线路时（比如为了看特定地区的 Netflix），在这里切换即可。
 
 ### 6. 🇨🇳 国内连接 (Direct Lane)
